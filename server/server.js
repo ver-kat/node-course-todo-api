@@ -26,7 +26,7 @@ app.get('/todos', (request, response) => {
         response.send({todos});
     }, (error) =>{
         response.status(400).send(error);
-    })
+    });
 });
 
 app.listen(3000, () => {
