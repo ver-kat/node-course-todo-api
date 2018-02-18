@@ -59,7 +59,7 @@ app.delete('/todos/:id', (request, response) => {
         if(!todo){
             response.status(404).send();
         }
-        response.send(todo);
+        response.send({todo: todo});
         //response.status(200).send();
     }).catch((error) => {
         response.status(400).send();
