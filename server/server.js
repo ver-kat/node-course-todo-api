@@ -8,11 +8,16 @@ const bodyparser = require('body-parser');
 var {mongoose} = require('./db/mongoose')
 var {Todo} = require('./models/todo');
 var {User} = require('./models/user');
+var {authenticate} = require('./middleware/authenticate');
 
 var app = express();
 const port = process.env.PORT;
 
 app.use(bodyparser.json());
+
+app.get('/users/me', authenticate, (request, response) => {
+    response.send(request.user);
+});
 
 app.post('/users', (request, response) => {
     var body = _.pick(request.body, ['email', 'password']);
