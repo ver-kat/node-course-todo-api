@@ -25,12 +25,22 @@ app.post('/users', (request, response) => {
     user.save().then(() => {
         return user.generateAuthToken();
     }).then((token) => {
-        console.log(token);
         response.header('x-auth', token).send(user);
     }).catch((error) => {
         response.status(400).send(error);
     });
-    console.log(body);
+});
+
+app.post('/users/login', (request, response) => {
+    var body = _.pick(request.body, ['email', 'password']);
+
+    User.findByCredentials(body.email, body.password).then((user)=> {
+        return user.generateAuthToken().then((token) => {
+            response.header('x-auth', token).send(user);
+        });
+    }).catch((error) => {
+        response.status(400).send();
+    });
 });
 
 app.post('/todos', (request, response) => {
