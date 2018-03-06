@@ -11,6 +11,55 @@ const {todos, users, populateTodos, populateUsers} = require('./seed/seed');
 beforeEach(populateUsers);
 beforeEach(populateTodos);
 
+describe('POST /users/login', () => {
+    it('should login user and return auth token', (done) => {
+        request(app)
+        .post('/users/login')
+        .send({
+            email: users[1].email,
+            password: users[1].password
+        })
+        .expect(200)
+        .expect((response) => {
+            //expect(response.headers['x-auth']).toExist();
+            //expect(response.headers['x-auth']).to.be.a('string');
+        })
+        .end((error, result) => {
+            if(error){
+                return done(error);
+            }
+            User.findById(users[1]._id).then((user) => {
+                // expect(user.tokens[0]).toInclude({
+                //     access: 'Auth',
+                //     token: result.headers['x-auth']
+                // });
+                done();
+            }).catch((error) => done(error));
+        });
+    });
+    it('should reject invalid login', (done) => {
+        request(app)
+        .post('/users/login')
+        .send({
+            email: users[1].email + '1',
+            password: users[1].password
+        })
+        .expect(400)
+        .expect((response) => {
+            //expect(response.headers['x-auth']).toNotExist();
+        })
+        .end((error, result) => {
+            if(error){
+                return done(error);
+            }
+            User.findById(users[1]._id).then((user) => {
+                expect(user.tokens.length).toBe(0);
+                done();
+            }).catch((error) => done(error));
+        });
+    });
+});
+
 describe('POST /todos', () => {
     it('should create a new todo', (done) => {
         var text = 'test todo text';
@@ -199,7 +248,7 @@ describe('POST /users', () => {
                 //expect(user).toBe(!null);
                 //expect(user.password).toBe(!password);
                 done();
-            })
+            }).catch((error) => done(error));
         });
     });
     it('should return a return validation errors if request invalid', (done) => {
